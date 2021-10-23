@@ -363,4 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # remove json
-*.json
+settings.json
