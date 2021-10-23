@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Victoria;
+using Victoria.EventArgs;
 
 namespace PrivateMusicBot.Services
 {
@@ -47,6 +48,31 @@ namespace PrivateMusicBot.Services
             }
 
             // Other ready related stuff
+            this.lavaNode.OnTrackEnded += OnTrackEnded;
+        }
+
+        private async Task OnTrackEnded(TrackEndedEventArgs eventArgs)
+        {
+            //if (!eventArgs.Reason.ShouldPlayNext())
+            //{
+            //    return;
+            //}
+
+            var player = eventArgs.Player;
+            if (!player.Queue.TryDequeue(out var queueable))
+            {
+                await player.TextChannel.SendMessageAsync("Queue completed! Please add more tracks to rock n' roll!");
+                return;
+            }
+
+            if (!(queueable is LavaTrack track))
+            {
+                await player.TextChannel.SendMessageAsync("Next item in queue is not a track.");
+                return;
+            }
+
+            await eventArgs.Player.PlayAsync(track);
+            await eventArgs.Player.TextChannel.SendMessageAsync($"{eventArgs.Reason}: {eventArgs.Track.Title}\nNow playing: {track.Title}");
         }
 
         private async Task OnCommandExecuted(Optional<CommandInfo> commandInfo, ICommandContext commandContext, IResult result)
