@@ -49,6 +49,34 @@ namespace PrivateMusicBot.Commands
             }
         }
 
+        [Command("disconnect")]
+        [Alias("d")]
+        public async Task DisnonnectAsync()
+        {
+            if (!lavaNode.HasPlayer(Context.Guild))
+            {
+                await ReplyAsync("I'm already disconnected to a voice channel!");
+                return;
+            }
+
+            var voiceState = Context.User as IVoiceState;
+            if (voiceState?.VoiceChannel == null)
+            {
+                await ReplyAsync("You must be connected to a voice channel!");
+                return;
+            }
+
+            try
+            {
+                await lavaNode.LeaveAsync(voiceState.VoiceChannel);
+                await ReplyAsync($"Until next time!");
+            }
+            catch (Exception ex)
+            {
+                await ReplyAsync(ex.Message);
+            }
+        }
+
         [Command("play")]
         [Alias("p")]
         public async Task PlayAsync([Remainder] string query)
