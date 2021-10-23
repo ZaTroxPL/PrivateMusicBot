@@ -14,10 +14,4 @@
     <PackageReference Include="Victoria" Version="5.2.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="settings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
