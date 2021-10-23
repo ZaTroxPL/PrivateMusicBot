@@ -21,6 +21,20 @@ namespace PrivateMusicBot.Commands
             this.lavaNode = lavaNode;
         }
 
+        [Command("help")]
+        [Alias("h")]
+        public async Task HelpAsync()
+        {
+            string help = "Commands\n" + 
+                "-connect (-c): Make the bot connect to the voice channel.\n" +
+                "-disconnect (-d): Make the bot dissconnect from the voice channel.\n" +
+                "-play (-p): Play or queue songs from YouTube.\n" + 
+                "-next (-n): Skip to the next song in the queue.\n" + 
+                "-test: Check if the bot is working";
+            
+            await ReplyAsync(help);
+        }
+
         [Command("connect")]
         [Alias("c")]
         public async Task ConnectAsync()
