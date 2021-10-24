@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Victoria;
+using Victoria.Enums;
 using Victoria.EventArgs;
 
 namespace PrivateMusicBot.Services
@@ -53,10 +54,10 @@ namespace PrivateMusicBot.Services
 
         private async Task OnTrackEnded(TrackEndedEventArgs eventArgs)
         {
-            //if (!eventArgs.Reason.ShouldPlayNext())
-            //{
-            //    return;
-            //}
+            if (eventArgs.Reason == TrackEndReason.Replaced)
+            {
+                return;
+            }
 
             var player = eventArgs.Player;
             if (!player.Queue.TryDequeue(out var queueable))

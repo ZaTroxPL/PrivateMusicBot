@@ -69,7 +69,7 @@ namespace PrivateMusicBot.Commands
         {
             if (!lavaNode.HasPlayer(Context.Guild))
             {
-                await ReplyAsync("I'm already disconnected to a voice channel!");
+                await ReplyAsync("I'm already disconnected from a voice channel!");
                 return;
             }
 
