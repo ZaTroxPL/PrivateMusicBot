@@ -60,6 +60,11 @@ namespace PrivateMusicBot.Services
             }
 
             var player = eventArgs.Player;
+            if (player.Queue == null)
+            {
+                return;
+            }
+
             if (!player.Queue.TryDequeue(out var queueable))
             {
                 await player.TextChannel.SendMessageAsync("Queue completed! Please add more tracks to rock n' roll!");

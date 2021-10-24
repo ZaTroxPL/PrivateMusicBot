@@ -191,9 +191,10 @@ namespace PrivateMusicBot.Commands
         [Alias("q")]
         public async Task QueueAsync([Remainder] string query = null)
         {
-            if (query == null)
+            var parsed = int.TryParse(query, out int page);
+            if (!parsed && query != null)
             {
-                await ReplyAsync("working queue");
+                await ReplyAsync("Provided page number doesn't seem to be a numeric value.");
                 return;
             }
 
@@ -209,7 +210,68 @@ namespace PrivateMusicBot.Commands
                 await ReplyAsync("There are no songs in the queue");
                 return;
             }
+
+            var queue = player.Queue;
+            var currentTrack = player.Track;
+
+            var embedSongTitle = "";
+            var embedDuration = "";
+
+            // counter for keeping track of how many times the loop executed (should be max 10)
+            int counter = 0;
+            // initiating an index to use in the loop
+            int i = 0;
+            // if page is above 0, set the index, if not, leave the index at 0
+            if (page > 0)
+            {
+                // set the index to appropriate starting value, we subtract 1 because we work with 0 based systems 
+                i = page * 10 - 1;
+
+                // if the index is out of range, show the last page
+                if (i > queue.Count)
+                {
+                    if (queue.Count > 10)
+                    {
+                        i = queue.Count - 10;
+                    }
+                    else
+                    {
+                        i = 0;
+                    }
+                }
+            }
+
+            while (counter < 10 && i < queue.Count)
+            {
+                var songTitle = $"{i + 1}) " + queue.ElementAt(i).Title;
+                if (songTitle.Length > 65)
+                {
+                    songTitle = songTitle.Substring(0, 65).Trim() + "...";
+                }
+                embedSongTitle += songTitle + "\n";
+                embedDuration += $"{queue.ElementAt(i).Duration.Minutes}:{queue.ElementAt(i).Duration.Seconds}" + "\n";
+                counter++;
+
+                i++;
+            }
+
+            var embed1 = new EmbedBuilder()
+                .WithTitle("Currently Playing")
+                .AddField("Song", currentTrack.Title, true)
+                .AddField("Time Elapsed", $"{currentTrack.Position.Minutes}:{currentTrack.Position.Seconds}", true)
+                .AddField("Duration", $"{currentTrack.Duration.Minutes}:{currentTrack.Duration.Seconds}", true)
+                .Build();
+
+            await ReplyAsync(embed: embed1);
             
+            var embed2 = new EmbedBuilder()
+                .WithTitle("Queue")
+                .AddField("Song(s)", embedSongTitle, true)
+                .AddField("Duration", embedDuration, true)
+                .WithFooter(queue.Count - 10 > 0 ? $"There are {queue.Count - 10} more tracks in the queue." : "There are no more tracks in the queue.")
+                .Build();
+            
+            await ReplyAsync(embed: embed2);
 
         }
 
