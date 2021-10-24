@@ -35,21 +35,21 @@ namespace PrivateMusicBot.Services
 
         public override async Task InitializeAsync(CancellationToken cancellationToken)
         {
-            this.client.MessageReceived += OnMessageReceived;
-            this.client.Ready += OnReadyAsync;
-            this.service.CommandExecuted += OnCommandExecuted;
-            await this.service.AddModulesAsync(Assembly.GetEntryAssembly(), this.provider);
+            client.MessageReceived += OnMessageReceived;
+            client.Ready += OnReadyAsync;
+            service.CommandExecuted += OnCommandExecuted;
+            await service.AddModulesAsync(Assembly.GetEntryAssembly(), provider);
         }
 
         private async Task OnReadyAsync()
         {
-            if (!this.lavaNode.IsConnected)
+            if (!lavaNode.IsConnected)
             {
-                await this.lavaNode.ConnectAsync();
+                await lavaNode.ConnectAsync();
             }
 
             // Other ready related stuff
-            this.lavaNode.OnTrackEnded += OnTrackEnded;
+            lavaNode.OnTrackEnded += OnTrackEnded;
         }
 
         private async Task OnTrackEnded(TrackEndedEventArgs eventArgs)
@@ -89,10 +89,10 @@ namespace PrivateMusicBot.Services
             if (message.Source != MessageSource.User) return;
 
             var position = 0;
-            if (!message.HasStringPrefix(this.configuration["Prefix"],ref position)) return;
+            if (!message.HasStringPrefix(configuration["Prefix"],ref position)) return;
 
-            var context = new SocketCommandContext(this.client, message);
-            await this.service.ExecuteAsync(context, position, this.provider);
+            var context = new SocketCommandContext(client, message);
+            await service.ExecuteAsync(context, position, provider);
         }
     }
 }

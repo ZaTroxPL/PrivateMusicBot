@@ -25,14 +25,33 @@ namespace PrivateMusicBot.Commands
         [Alias("h")]
         public async Task HelpAsync()
         {
-            string help = "Commands\n" + 
-                "-connect (-c): Make the bot connect to the voice channel.\n" +
-                "-disconnect (-d): Make the bot dissconnect from the voice channel.\n" +
-                "-play (-p): Play or queue songs from YouTube.\n" + 
-                "-next (-n): Skip to the next song in the queue.\n" + 
-                "-test: Check if the bot is working";
+            Dictionary<string, string> commands = new Dictionary<string, string>() 
+            {
+                ["-connect (-c)"] = "Make the bot connect to the voice channel.",
+                ["-disconnect (-d)"] = "Make the bot dissconnect from the voice channel.",
+                ["-play ***query*** (-p)"] = "Play or queue songs from YouTube, query is required.",
+                ["-next (-n)"] = "Skip to the next song in the queue.",
+                ["-queue ***page no*** (-q)"] = "Show queue, page number is optional.",
+                ["-help (-h)"] = "Show this help section.",
+                ["-test"] = "Check if the bot is working.",
+            };
+
+            var embedCommands = "";
+            var embedNotes = "";
+
+            foreach (var command in commands)
+            {
+                embedCommands += command.Key + "\n";
+                embedNotes += command.Value + "\n";
+            }
+
+            var embed = new EmbedBuilder()
+                .WithTitle("Help Section")
+                .AddField("Commands", embedCommands, true)
+                .AddField("Notes", embedNotes, true)
+                .Build();
             
-            await ReplyAsync(help);
+            await ReplyAsync(embed: embed);
         }
 
         [Command("connect")]
@@ -116,7 +135,7 @@ namespace PrivateMusicBot.Commands
                 return;
             }
 
-            var player = lavaNode.GetPlayer(Context.Guild);
+            var player = lavaNode.GetPlayer(Context.Guild);            
 
             if (player.PlayerState == PlayerState.Playing || player.PlayerState == PlayerState.Paused)
             {
@@ -127,7 +146,7 @@ namespace PrivateMusicBot.Commands
             }
             else
             {
-                var track = searchResponse.Tracks.First();                
+                var track = searchResponse.Tracks.First();                   
                 await player.PlayAsync(track);
                 await ReplyAsync($"Now Playing: {track.Title}");                
             }
@@ -166,6 +185,32 @@ namespace PrivateMusicBot.Commands
 
             await player.SkipAsync();
             await ReplyAsync($"Playing the next song: {player.Track.Title}");
+        }
+
+        [Command("queue")]
+        [Alias("q")]
+        public async Task QueueAsync([Remainder] string query = null)
+        {
+            if (query == null)
+            {
+                await ReplyAsync("working queue");
+                return;
+            }
+
+            if (!lavaNode.HasPlayer(Context.Guild))
+            {
+                await ReplyAsync("I'm not connected to a voice channel!");
+                return;
+            }
+
+            var player = lavaNode.GetPlayer(Context.Guild);
+            if (player.Queue.Count == 0)
+            {
+                await ReplyAsync("There are no songs in the queue");
+                return;
+            }
+            
+
         }
 
         [Command("test")]
