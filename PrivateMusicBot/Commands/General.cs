@@ -148,6 +148,7 @@ namespace PrivateMusicBot.Commands
             {
                 var track = searchResponse.Tracks.First();                   
                 await player.PlayAsync(track);
+                await player.UpdateVolumeAsync(50);
                 await ReplyAsync($"Now Playing: {track.Title}");                
             }
             
@@ -184,6 +185,12 @@ namespace PrivateMusicBot.Commands
             }
 
             await player.SkipAsync();
+
+            // set the volume for the next track
+            var volume = player.Volume.ToString();
+            ushort.TryParse(volume, out ushort nextVolume);
+            await player.UpdateVolumeAsync(nextVolume);
+
             await ReplyAsync($"Playing the next song: {player.Track.Title}");
         }
 
@@ -282,7 +289,13 @@ namespace PrivateMusicBot.Commands
             var parsed = ushort.TryParse(query, out ushort volume);
             if (!parsed)
             {
-                await ReplyAsync("Provided page number doesn't seem to be a numeric value or is not between the range of 0 - 65535.");
+                await ReplyAsync("Provided volume value doesn't seem to be numeric or is not between the range of 0 - 65535.");
+                return;
+            }
+
+            if (volume > 500)
+            {
+                await ReplyAsync("... Did you really think I would let someone increase the volume to like 60,000?");
                 return;
             }
 

@@ -53,7 +53,7 @@ namespace PrivateMusicBot
                 services.AddHostedService<Services.CommandHandler>()
                     .AddLavaNode(x =>
                     {
-                        x.SelfDeaf = true;                       
+                        x.SelfDeaf = true;                        
                     });
             })
             .UseConsoleLifetime();
