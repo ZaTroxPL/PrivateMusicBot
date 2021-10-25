@@ -33,6 +33,7 @@ namespace PrivateMusicBot.Commands
                 ["-next (-n)"] = "Skip to the next song in the queue.",
                 ["-queue ***page no*** (-q)"] = "Show queue, page number is optional.",
                 ["-help (-h)"] = "Show this help section.",
+                ["-volume ***value*** (-v)"] = "Set the volume of the bot, value is required.",
                 ["-test"] = "Check if the bot is working.",
             };
 
@@ -72,7 +73,7 @@ namespace PrivateMusicBot.Commands
             }
 
             try
-            {
+            {             
                 await lavaNode.JoinAsync(voiceState.VoiceChannel, Context.Channel as ITextChannel);
                 await ReplyAsync($"Joined ${voiceState.VoiceChannel.Name}");
             }
@@ -135,8 +136,7 @@ namespace PrivateMusicBot.Commands
                 return;
             }
 
-            var player = lavaNode.GetPlayer(Context.Guild);            
-
+            var player = lavaNode.GetPlayer(Context.Guild);                        
             if (player.PlayerState == PlayerState.Playing || player.PlayerState == PlayerState.Paused)
             {
                 var track = searchResponse.Tracks.First();
@@ -217,15 +217,15 @@ namespace PrivateMusicBot.Commands
             var embedSongTitle = "";
             var embedDuration = "";
 
-            // counter for keeping track of how many times the loop executed (should be max 10)
+            // counter for keeping track of how many times the loop executed (should max at 10)
             int counter = 0;
             // initiating an index to use in the loop
             int i = 0;
-            // if page is above 0, set the index, if not, leave the index at 0
-            if (page > 0)
+            // if page is above 1, set the index, if not, leave the index at 0
+            if (page > 1)
             {
-                // set the index to appropriate starting value, we subtract 1 because we work with 0 based systems 
-                i = page * 10 - 1;
+                // set the index to appropriate starting value, we subtract 1 from var page because we want the index to start at beginning of a page
+                i = (page - 1) * 10;
 
                 // if the index is out of range, show the last page
                 if (i > queue.Count)
@@ -273,6 +273,41 @@ namespace PrivateMusicBot.Commands
             
             await ReplyAsync(embed: embed2);
 
+        }
+
+        [Command("volume")]
+        [Alias("v")]
+        public async Task VolumeAsync([Remainder] string query)
+        {
+            var parsed = ushort.TryParse(query, out ushort volume);
+            if (!parsed)
+            {
+                await ReplyAsync("Provided page number doesn't seem to be a numeric value or is not between the range of 0 - 65535.");
+                return;
+            }
+
+            if (!lavaNode.HasPlayer(Context.Guild))
+            {
+                await ReplyAsync("I'm not connected to a voice channel!");
+                return;
+            }
+
+            var player = lavaNode.GetPlayer(Context.Guild);
+            var voiceState = Context.User as IVoiceState;
+
+            if (voiceState?.VoiceChannel == null)
+            {
+                await ReplyAsync("You must be connected to a voice channel!");
+                return;
+            }
+
+            if (voiceState.VoiceChannel != player.VoiceChannel)
+            {
+                await ReplyAsync("You must be connected to the same voice channel as me!");
+                return;
+            }
+
+            await player.UpdateVolumeAsync(volume);
         }
 
         [Command("test")]
