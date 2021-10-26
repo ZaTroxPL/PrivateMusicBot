@@ -82,7 +82,7 @@ namespace PrivateMusicBot.Services
             ushort.TryParse(volume, out ushort nextVolume);
 
             await eventArgs.Player.PlayAsync(track);
-            await eventArgs.Player.UpdateVolumeAsync(nextVolume);
+            //await eventArgs.Player.UpdateVolumeAsync(nextVolume);
             await eventArgs.Player.TextChannel.SendMessageAsync($"{eventArgs.Reason}: {eventArgs.Track.Title}\nNow playing: {track.Title}");
         }
 

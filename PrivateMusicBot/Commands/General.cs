@@ -320,7 +320,7 @@ namespace PrivateMusicBot.Commands
                 return;
             }
 
-            await player.UpdateVolumeAsync(volume);
+            //await player.UpdateVolumeAsync(volume);
         }
 
         [Command("test")]
