@@ -148,7 +148,7 @@ namespace PrivateMusicBot.Commands
             {
                 var track = searchResponse.Tracks.First();                   
                 await player.PlayAsync(track);
-                await player.UpdateVolumeAsync(50);
+                //await player.UpdateVolumeAsync(50);
                 await ReplyAsync($"Now Playing: {track.Title}");                
             }
             
