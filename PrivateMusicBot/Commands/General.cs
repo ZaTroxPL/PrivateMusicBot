@@ -148,7 +148,7 @@ namespace PrivateMusicBot.Commands
             {
                 var track = searchResponse.Tracks.First();                   
                 await player.PlayAsync(track);
-                //await player.UpdateVolumeAsync(50);
+                await player.UpdateVolumeAsync(50);
                 await ReplyAsync($"Now Playing: {track.Title}");                
             }
             
@@ -189,7 +189,7 @@ namespace PrivateMusicBot.Commands
             // set the volume for the next track
             var volume = player.Volume.ToString();
             ushort.TryParse(volume, out ushort nextVolume);
-            //await player.UpdateVolumeAsync(nextVolume);
+            await player.UpdateVolumeAsync(nextVolume);
 
             await ReplyAsync($"Playing the next song: {player.Track.Title}");
         }
@@ -320,7 +320,7 @@ namespace PrivateMusicBot.Commands
                 return;
             }
 
-            //await player.UpdateVolumeAsync(volume);
+            await player.UpdateVolumeAsync(volume);
         }
 
         [Command("test")]
