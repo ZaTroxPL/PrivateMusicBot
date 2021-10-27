@@ -33,7 +33,7 @@ namespace PrivateMusicBot.Commands
                 ["-next (-n)"] = "Skip to the next song in the queue.",
                 ["-queue ***page no*** (-q)"] = "Show queue, page number is optional.",
                 ["-help (-h)"] = "Show this help section.",
-                ["-volume ***value*** (-v)"] = "Set the volume of the bot, value is required. **NOT WORKING AT THE MOMENT**",
+                ["-volume ***value*** (-v)"] = "Set the volume of the bot, value is required. **DOESN'T WORK**",
                 ["-test"] = "Check if the bot is working.",
             };
 
