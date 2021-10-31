@@ -286,6 +286,20 @@ namespace PrivateMusicBot.Commands
             }
 
             var player = lavaNode.GetPlayer(Context.Guild);
+            var currentTrack = player.Track;
+
+            if (player.PlayerState == PlayerState.Playing || player.PlayerState == PlayerState.Paused)
+            {
+                var embed1 = new EmbedBuilder()
+                    .WithTitle("Currently Playing")
+                    .AddField("Song", currentTrack.Title, true)
+                    .AddField("Time Elapsed", $"{currentTrack.Position.Minutes}:{currentTrack.Position.Seconds}", true)
+                    .AddField("Duration", $"{currentTrack.Duration.Minutes}:{currentTrack.Duration.Seconds}", true)
+                    .Build();
+
+                await ReplyAsync(embed: embed1);
+            }
+
             if (player.Queue.Count == 0)
             {
                 await ReplyAsync("There are no songs in the queue");
@@ -293,7 +307,6 @@ namespace PrivateMusicBot.Commands
             }
 
             var queue = player.Queue;
-            var currentTrack = player.Track;
 
             var embedSongTitle = "";
             var embedDuration = "";
@@ -336,14 +349,6 @@ namespace PrivateMusicBot.Commands
                 i++;
             }
 
-            var embed1 = new EmbedBuilder()
-                .WithTitle("Currently Playing")
-                .AddField("Song", currentTrack.Title, true)
-                .AddField("Time Elapsed", $"{currentTrack.Position.Minutes}:{currentTrack.Position.Seconds}", true)
-                .AddField("Duration", $"{currentTrack.Duration.Minutes}:{currentTrack.Duration.Seconds}", true)
-                .Build();
-
-            await ReplyAsync(embed: embed1);
             
             var embed2 = new EmbedBuilder()
                 .WithTitle("Queue")
