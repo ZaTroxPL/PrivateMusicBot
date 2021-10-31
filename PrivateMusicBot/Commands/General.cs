@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Victoria;
 using Victoria.Enums;
 using Victoria.EventArgs;
+using Victoria.Filters;
 using Victoria.Responses.Search;
 
 namespace PrivateMusicBot.Commands
@@ -25,7 +26,7 @@ namespace PrivateMusicBot.Commands
         [Alias("h")]
         public async Task HelpAsync()
         {
-            Dictionary<string, string> commands = new Dictionary<string, string>() 
+            Dictionary<string, string> commands = new() 
             {
                 ["-connect (-c)"] = "Make the bot connect to the voice channel.",
                 ["-disconnect (-d)"] = "Make the bot dissconnect from the voice channel.",
@@ -178,7 +179,7 @@ namespace PrivateMusicBot.Commands
                 return;
             }
 
-            if (player.Queue.Count == 0)
+            if (player.Queue == null || player.Queue?.Count == 0)
             {
                 await ReplyAsync("There are no songs in the queue");
                 return;
@@ -187,8 +188,8 @@ namespace PrivateMusicBot.Commands
             await player.SkipAsync();
 
             // set the volume for the next track
-            var volume = player.Volume.ToString();
-            ushort.TryParse(volume, out ushort nextVolume);
+            //var volume = player.Volume.ToString();
+            //ushort.TryParse(volume, out ushort nextVolume);
             //await player.UpdateVolumeAsync(nextVolume);
 
             await ReplyAsync($"Playing the next song: {player.Track.Title}");
@@ -286,7 +287,7 @@ namespace PrivateMusicBot.Commands
         [Alias("v")]
         public async Task VolumeAsync([Remainder] string query)
         {
-            var parsed = double.TryParse(query, out double volume);
+            var parsed = float.TryParse(query, out float volume);
             if (!parsed)
             {
                 await ReplyAsync("Provided volume value doesn't seem to be numeric or is not between the range of 0 - 1.");
@@ -319,8 +320,15 @@ namespace PrivateMusicBot.Commands
                 return;
             }
 
-            await player.ApplyFilterAsync(null, volume, null);
+            var filter = new TimescaleFilter()
+            {
+                Speed = 1,
+                Pitch = 1,
+                Rate = 1
+            };
+            var equalizerBands = player.Equalizer.Count > 0 ? player.Equalizer.First() : new EqualizerBand();
 
+            //await player.ApplyFilterAsync(filter, volume, equalizerBands);
             //await player.UpdateVolumeAsync(volume);
         }
 

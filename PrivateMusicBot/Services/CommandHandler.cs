@@ -71,15 +71,15 @@ namespace PrivateMusicBot.Services
                 return;
             }
 
-            if (!(queueable is LavaTrack track))
+            if (queueable is not LavaTrack track)
             {
                 await player.TextChannel.SendMessageAsync("Next item in queue is not a track.");
                 return;
             }
 
             // set the volume for the next track
-            var volume = player.Volume.ToString();
-            ushort.TryParse(volume, out ushort nextVolume);
+            //var volume = player.Volume.ToString();
+            //ushort.TryParse(volume, out ushort nextVolume);
 
             await eventArgs.Player.PlayAsync(track);
             //await eventArgs.Player.UpdateVolumeAsync(nextVolume);
@@ -95,7 +95,7 @@ namespace PrivateMusicBot.Services
 
         private async Task OnMessageReceived(SocketMessage socketMessage)
         {
-            if (!(socketMessage is SocketUserMessage message)) return;
+            if (socketMessage is not SocketUserMessage message) return;
             if (message.Source != MessageSource.User) return;
 
             var position = 0;
