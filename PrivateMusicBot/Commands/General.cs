@@ -31,6 +31,8 @@ namespace PrivateMusicBot.Commands
                 ["-connect (-c)"] = "Make the bot connect to the voice channel.",
                 ["-disconnect (-d)"] = "Make the bot dissconnect from the voice channel.",
                 ["-play ***query*** (-p)"] = "Play or queue songs from YouTube, query is required.",
+                ["-pause"] = "Pauses current song.",
+                ["-resume"] = "Resumes current song.",
                 ["-next (-n)"] = "Skip to the next song in the queue.",
                 ["-queue ***page no*** (-q)"] = "Show queue, page number is optional.",
                 ["-help (-h)"] = "Show this help section.",
