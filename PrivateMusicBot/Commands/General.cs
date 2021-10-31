@@ -200,6 +200,9 @@ namespace PrivateMusicBot.Commands
         public async Task QueueAsync([Remainder] string query = null)
         {
             var parsed = int.TryParse(query, out int page);
+            if (!parsed ||  page < 1)
+                page = 1;
+
             if (!parsed && query != null)
             {
                 await ReplyAsync("Provided page number doesn't seem to be a numeric value.");
@@ -276,7 +279,7 @@ namespace PrivateMusicBot.Commands
                 .WithTitle("Queue")
                 .AddField("Song(s)", embedSongTitle, true)
                 .AddField("Duration", embedDuration, true)
-                .WithFooter(queue.Count - 10 > 0 ? $"There are {queue.Count - 10} more tracks in the queue." : "There are no more tracks in the queue.")
+                .WithFooter(queue.Count - (10 * page) > 0 ? $"There are {queue.Count - (10 * page)} more tracks in the queue." : "There are no more tracks in the queue.")
                 .Build();
             
             await ReplyAsync(embed: embed2);
