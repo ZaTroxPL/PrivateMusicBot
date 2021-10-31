@@ -153,7 +153,75 @@ namespace PrivateMusicBot.Commands
                 await ReplyAsync($"Now Playing: {track.Title}");                
             }
             
-        }     
+        } 
+        
+        [Command("pause")]
+        public async Task PauseAsync()
+        {
+            if (!lavaNode.HasPlayer(Context.Guild))
+            {
+                await ReplyAsync("I'm not connected to a voice channel!");
+                return;
+            }
+
+            var voiceState = Context.User as IVoiceState;
+            if (voiceState?.VoiceChannel == null)
+            {
+                await ReplyAsync("You must be connected to a voice channel!");
+                return;
+            }
+
+            var player = lavaNode.GetPlayer(Context.Guild);
+            if (voiceState.VoiceChannel != player.VoiceChannel)
+            {
+                await ReplyAsync("You must be connected to the same voice channel as me!");
+                return;
+            }
+
+            if (player.PlayerState == PlayerState.Playing)
+            {
+                await player.PauseAsync();
+                await ReplyAsync("Paused the song.");
+            }
+            else
+            {
+                await ReplyAsync("Couldn't find a song to pause.");
+            }
+        }
+
+        [Command("resume")]
+        public async Task ResumeAsync()
+        {
+            if (!lavaNode.HasPlayer(Context.Guild))
+            {
+                await ReplyAsync("I'm not connected to a voice channel!");
+                return;
+            }
+
+            var voiceState = Context.User as IVoiceState;
+            if (voiceState?.VoiceChannel == null)
+            {
+                await ReplyAsync("You must be connected to a voice channel!");
+                return;
+            }
+
+            var player = lavaNode.GetPlayer(Context.Guild);
+            if (voiceState.VoiceChannel != player.VoiceChannel)
+            {
+                await ReplyAsync("You must be connected to the same voice channel as me!");
+                return;
+            }
+
+            if (player.PlayerState == PlayerState.Paused)
+            {
+                await player.ResumeAsync();
+                await ReplyAsync("Resumed the song.");
+            }
+            else
+            {
+                await ReplyAsync("Couldn't find a song to resume.");
+            }
+        }
         
         [Command("next")]
         [Alias("n")]
