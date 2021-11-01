@@ -33,7 +33,7 @@ namespace PrivateMusicBot.Commands
                 ["-play ***query*** (-p)"] = "Play or queue songs from YouTube, query is required.",
                 ["-pause"] = "Pauses current song.",
                 ["-resume"] = "Resumes current song.",
-                ["-next (-n)"] = "Skip to the next song in the queue. **Sometimes crashes the Bot**",
+                ["-next (-n)"] = "Skip to the next song in the queue. **It may crash the Bot**",
                 ["-queue ***page no*** (-q)"] = "Show queue, page number is optional.",
                 ["-help (-h)"] = "Show this help section.",
                 ["-volume ***value*** (-v)"] = "Set the volume of the bot, value is optional.",
@@ -396,7 +396,7 @@ namespace PrivateMusicBot.Commands
                     return;
                 }
 
-                if (volume > 200)
+                if (volume > 100)
                 {
                     await ReplyAsync("... Did you really think I would let someone increase the volume to like 60,000?.");
                     return;
