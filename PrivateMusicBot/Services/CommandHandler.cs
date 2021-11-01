@@ -78,11 +78,11 @@ namespace PrivateMusicBot.Services
             }
 
             // set the volume for the next track
-            //var volume = player.Volume.ToString();
-            //ushort.TryParse(volume, out ushort nextVolume);
+            var volume = player.Volume.ToString();
+            ushort.TryParse(volume, out ushort nextVolume);
 
             await eventArgs.Player.PlayAsync(track);
-            //await eventArgs.Player.UpdateVolumeAsync(nextVolume);
+            await eventArgs.Player.UpdateVolumeAsync(nextVolume);
             await eventArgs.Player.TextChannel.SendMessageAsync($"{eventArgs.Reason}: {eventArgs.Track.Title}\nNow playing: {track.Title}");
         }
 

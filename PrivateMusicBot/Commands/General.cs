@@ -36,7 +36,7 @@ namespace PrivateMusicBot.Commands
                 ["-next (-n)"] = "Skip to the next song in the queue.",
                 ["-queue ***page no*** (-q)"] = "Show queue, page number is optional.",
                 ["-help (-h)"] = "Show this help section.",
-                ["-volume ***value*** (-v)"] = "Set the volume of the bot, value is required. **DOESN'T WORK**",
+                ["-volume ***value*** (-v)"] = "Set the volume of the bot, value is required.",
                 ["-test"] = "Check if the bot is working.",
             };
 
@@ -151,7 +151,7 @@ namespace PrivateMusicBot.Commands
             {
                 var track = searchResponse.Tracks.First();                   
                 await player.PlayAsync(track);
-                //await player.UpdateVolumeAsync(50);
+                await player.UpdateVolumeAsync(50);
                 await ReplyAsync($"Now Playing: {track.Title}");                
             }
             
@@ -258,9 +258,9 @@ namespace PrivateMusicBot.Commands
             await player.SkipAsync();
 
             // set the volume for the next track
-            //var volume = player.Volume.ToString();
-            //ushort.TryParse(volume, out ushort nextVolume);
-            //await player.UpdateVolumeAsync(nextVolume);
+            var volume = player.Volume.ToString();
+            ushort.TryParse(volume, out ushort nextVolume);
+            await player.UpdateVolumeAsync(nextVolume);
 
             await ReplyAsync($"Playing the next song: {player.Track.Title}");
         }
@@ -365,18 +365,6 @@ namespace PrivateMusicBot.Commands
         [Alias("v")]
         public async Task VolumeAsync([Remainder] string query)
         {
-            var parsed = float.TryParse(query, out float volume);
-            if (!parsed)
-            {
-                await ReplyAsync("Provided volume value doesn't seem to be numeric or is not between the range of 0 - 1.");
-                return;
-            }
-
-            if (volume > 1)
-            {
-                return;
-            }
-
             if (!lavaNode.HasPlayer(Context.Guild))
             {
                 await ReplyAsync("I'm not connected to a voice channel!");
@@ -398,16 +386,20 @@ namespace PrivateMusicBot.Commands
                 return;
             }
 
-            var filter = new TimescaleFilter()
+            var parsed = ushort.TryParse(query, out ushort volume);
+            if (!parsed)
             {
-                Speed = 1,
-                Pitch = 1,
-                Rate = 1
-            };
-            var equalizerBands = player.Equalizer.Count > 0 ? player.Equalizer.First() : new EqualizerBand();
+                await ReplyAsync("Provided volume value doesn't seem to be numeric or is not between the range of 0 - 65,535.");
+                return;
+            }
 
-            //await player.ApplyFilterAsync(filter, volume, equalizerBands);
-            //await player.UpdateVolumeAsync(volume);
+            if (volume > 200)
+            {
+                await ReplyAsync("... Did you really think I would let someone increase the volume to like 60,000?.");
+                return;
+            }
+
+            await player.UpdateVolumeAsync(volume);
         }
 
         [Command("test")]
