@@ -33,10 +33,10 @@ namespace PrivateMusicBot.Commands
                 ["-play ***query*** (-p)"] = "Play or queue songs from YouTube, query is required.",
                 ["-pause"] = "Pauses current song.",
                 ["-resume"] = "Resumes current song.",
-                ["-next (-n)"] = "Skip to the next song in the queue.",
+                ["-next (-n)"] = "Skip to the next song in the queue. **Sometimes crashes the Bot**",
                 ["-queue ***page no*** (-q)"] = "Show queue, page number is optional.",
                 ["-help (-h)"] = "Show this help section.",
-                ["-volume ***value*** (-v)"] = "Set the volume of the bot, value is required.",
+                ["-volume ***value*** (-v)"] = "Set the volume of the bot, value is optional.",
                 ["-test"] = "Check if the bot is working.",
             };
 
@@ -151,7 +151,7 @@ namespace PrivateMusicBot.Commands
             {
                 var track = searchResponse.Tracks.First();                   
                 await player.PlayAsync(track);
-                await player.UpdateVolumeAsync(50);
+                await player.UpdateVolumeAsync(10);
                 await ReplyAsync($"Now Playing: {track.Title}");                
             }
             
@@ -363,7 +363,7 @@ namespace PrivateMusicBot.Commands
 
         [Command("volume")]
         [Alias("v")]
-        public async Task VolumeAsync([Remainder] string query)
+        public async Task VolumeAsync([Remainder] string query = null)
         {
             if (!lavaNode.HasPlayer(Context.Guild))
             {
@@ -386,20 +386,28 @@ namespace PrivateMusicBot.Commands
                 return;
             }
 
-            var parsed = ushort.TryParse(query, out ushort volume);
-            if (!parsed)
+            // change volume path
+            if (!string.IsNullOrEmpty(query))
             {
-                await ReplyAsync("Provided volume value doesn't seem to be numeric or is not between the range of 0 - 65,535.");
-                return;
-            }
+                var parsed = ushort.TryParse(query, out ushort volume);
+                if (!parsed)
+                {
+                    await ReplyAsync("Provided volume value doesn't seem to be numeric or is not between the range of 0 - 65,535.");
+                    return;
+                }
 
-            if (volume > 200)
+                if (volume > 200)
+                {
+                    await ReplyAsync("... Did you really think I would let someone increase the volume to like 60,000?.");
+                    return;
+                }
+
+                await player.UpdateVolumeAsync(volume);
+            }
+            else
             {
-                await ReplyAsync("... Did you really think I would let someone increase the volume to like 60,000?.");
-                return;
+                await ReplyAsync($"Current volume is set to {player.Volume}.\nVolume value can be set to any number between 0 and 65,535.");                
             }
-
-            await player.UpdateVolumeAsync(volume);
         }
 
         [Command("test")]
