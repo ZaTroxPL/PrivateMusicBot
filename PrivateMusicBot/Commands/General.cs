@@ -392,13 +392,18 @@ namespace PrivateMusicBot.Commands
                 var parsed = ushort.TryParse(query, out ushort volume);
                 if (!parsed)
                 {
-                    await ReplyAsync("Provided volume value doesn't seem to be numeric or is not between the range of 0 - 65,535.");
+                    await ReplyAsync("Provided volume value doesn't seem to be numeric or is not between the range of 0 - 50.");
                     return;
                 }
 
-                if (volume > 100)
+                if (Context.User.Id == 569306896754933770 && volume > 50)
                 {
-                    await ReplyAsync("... Did you really think I would let someone increase the volume to like 60,000?.");
+                    await ReplyAsync("Dylan you cunt, why are you trying to deafen everyone.");
+                    return;
+                }
+                else if (volume > 50)
+                {
+                    await ReplyAsync($"{Context.User.Username} why are you trying to deafen everyone?");
                     return;
                 }
 
@@ -406,7 +411,7 @@ namespace PrivateMusicBot.Commands
             }
             else
             {
-                await ReplyAsync($"Current volume is set to {player.Volume}.\nVolume value can be set to any number between 0 and 65,535.");                
+                await ReplyAsync($"Current volume is set to {player.Volume}.\nVolume value can be set to any number between 0 and 50.");                
             }
         }
 
