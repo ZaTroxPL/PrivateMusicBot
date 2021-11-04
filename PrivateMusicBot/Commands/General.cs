@@ -30,7 +30,7 @@ namespace PrivateMusicBot.Commands
             {
                 ["-connect (-c)"] = "Make the bot connect to the voice channel.",
                 ["-disconnect (-d)"] = "Make the bot dissconnect from the voice channel.",
-                ["-play ***query*** (-p)"] = "Play or queue songs from YouTube, query is required.",
+                ["-play ***query*** (-p)"] = "Play or queue songs, query is required.",
                 ["-pause"] = "Pauses current song.",
                 ["-resume"] = "Resumes current song.",
                 ["-next (-n)"] = "Skip to the next song in the queue. **It may crash the Bot**",
@@ -129,9 +129,8 @@ namespace PrivateMusicBot.Commands
                 await ReplyAsync("I'm not connected to a voice channel.");
                 return;
             }
-
             
-            var searchResponse = await lavaNode.SearchAsync(SearchType.YouTube, query);
+            var searchResponse = await lavaNode.SearchAsync(SearchType.Direct, query);            
             if (searchResponse.Status == SearchStatus.LoadFailed ||
                 searchResponse.Status == SearchStatus.NoMatches)
             {
@@ -142,17 +141,45 @@ namespace PrivateMusicBot.Commands
             var player = lavaNode.GetPlayer(Context.Guild);                        
             if (player.PlayerState == PlayerState.Playing || player.PlayerState == PlayerState.Paused)
             {
-                var track = searchResponse.Tracks.First();
-                player.Queue.Enqueue(track);
-                await ReplyAsync($"Enqueued: {track.Title}");
-                
+                if (searchResponse.Status == SearchStatus.PlaylistLoaded)
+                {
+                    foreach (var track in searchResponse.Tracks)
+                    {
+                        player.Queue.Enqueue(track);
+                    }
+                    await ReplyAsync($"Enqueued: **{searchResponse.Playlist.Name}** playlist with **{searchResponse.Tracks.Count}** track(s).");
+                }
+                else
+                {
+                    var track = searchResponse.Tracks.First();
+                    player.Queue.Enqueue(track);
+                    await ReplyAsync($"Enqueued: {track.Title}");
+                }                
             }
             else
             {
-                var track = searchResponse.Tracks.First();                   
-                await player.PlayAsync(track);
-                await player.UpdateVolumeAsync(10);
-                await ReplyAsync($"Now Playing: {track.Title}");                
+                if (searchResponse.Status == SearchStatus.PlaylistLoaded)
+                {
+                    var firstTrack = searchResponse.Tracks.First();
+                    foreach (var track in searchResponse.Tracks)
+                    {
+                        if (firstTrack == track)                        
+                            continue;
+                       
+                        player.Queue.Enqueue(track);
+                    }
+                    await player.PlayAsync(firstTrack);
+                    await player.UpdateVolumeAsync(10);
+                    await ReplyAsync($"Now Playing: {firstTrack.Title}");
+                    await ReplyAsync($"Enqueued: **{searchResponse.Playlist.Name}** playlist with **{searchResponse.Tracks.Count}** track(s).");
+                }
+                else
+                {
+                    var track = searchResponse.Tracks.First();                   
+                    await player.PlayAsync(track);
+                    await player.UpdateVolumeAsync(10);
+                    await ReplyAsync($"Now Playing: {track.Title}");                
+                }
             }
             
         } 
@@ -255,7 +282,9 @@ namespace PrivateMusicBot.Commands
                 return;
             }
 
-            await player.SkipAsync();
+            var nextTrack = player.Queue.First();
+
+            await player.PlayAsync(nextTrack);
 
             // set the volume for the next track
             var volume = player.Volume.ToString();
