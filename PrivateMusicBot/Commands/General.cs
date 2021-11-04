@@ -129,8 +129,17 @@ namespace PrivateMusicBot.Commands
                 await ReplyAsync("I'm not connected to a voice channel.");
                 return;
             }
-            
-            var searchResponse = await lavaNode.SearchAsync(SearchType.Direct, query);            
+
+            SearchResponse searchResponse;
+            if (query.StartsWith("https://") || query.StartsWith("http://"))
+            {
+                searchResponse = await lavaNode.SearchAsync(SearchType.Direct, query);            
+            }
+            else
+            {
+                searchResponse = await lavaNode.SearchAsync(SearchType.YouTube, query);
+            }
+
             if (searchResponse.Status == SearchStatus.LoadFailed ||
                 searchResponse.Status == SearchStatus.NoMatches)
             {
